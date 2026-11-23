@@ -11,6 +11,11 @@ const Sentiment = z.object({
   reason: z.string(),
 });
 
+// Additional application-level validation
+const Checked = Sentiment.extend({
+  score: z.number().min(0).max(1),
+});
+
 async function main() {
   const question = process.argv[2]?? "The checkout was quick and the support team was lovely.";
 
@@ -23,6 +28,21 @@ async function main() {
   });
   const result = response.output_parsed; // typed as { sentiment, score, reason }, or null
   if (!result) throw new Error("No structured result (the model may have refused)");
+    
+  // Validate the result against our stricter schema
+  const check = Checked.safeParse(result);
+
+  if (!check.success) {
+    console.error("Invalid sentiment result:");
+    console.error(check.error.issues);
+
+    throw new Error("Sentiment validation failed");
+  }
+
+  // Use the validated data from this point onward
+  console.log("Validated result:", check.data);
+
+  //direct result
   console.log(result);
 
   console.log("Tokens:", response.usage?.input_tokens, "in,", response.usage?.output_tokens, "out");
