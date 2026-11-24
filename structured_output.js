@@ -24,7 +24,7 @@ async function main() {
     instructions: "Classify the sentiment of customer feedback. score is your confidence from 0 to 1.",
     input: question,
     max_output_tokens: 300,
-      text: { format: zodTextFormat(Sentiment, "sentiment") },
+    text: { format: zodTextFormat(Sentiment, "sentiment") },
   });
   const result = response.output_parsed; // typed as { sentiment, score, reason }, or null
   if (!result) throw new Error("No structured result (the model may have refused)");
@@ -41,9 +41,6 @@ async function main() {
 
   // Use the validated data from this point onward
   console.log("Validated result:", check.data);
-
-  //direct result
-  console.log(result);
 
   console.log("Tokens:", response.usage?.input_tokens, "in,", response.usage?.output_tokens, "out");
 }
